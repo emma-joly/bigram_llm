@@ -4,25 +4,27 @@ from torch.nn import functional as F
 from bigram import BigramLanguageModel
 from data_processing import *
 from helper_functions import *
-import time
+import os
 
 ## USER INPUTS ##
-data_path = 'frankenstein.txt'
+data_path = 'data'
 
 train_test_split = 0.8
 block_size = 8
-batch_size = 4
+batch_size = 32
 
 max_iters = 10000
-learning_rate = 3e-4
+learning_rate = 1e-2
 eval_iters = 250
-dropout = 0.2
+#################
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print(device)
 
-## READ DATA ##
-corpus = load_file(data_path)
+corpus = ''
+for file in os.listdir(data_path):
+    path = data_path + '/' + file
+    corpus = corpus + load_file(path)
 encode, decode, vocab_size = tokenize(corpus)
 
 data = torch.tensor(encode(corpus), dtype=torch.long)
@@ -51,3 +53,6 @@ for iter in range(max_iters):
     optimizer.zero_grad(set_to_none=True)
     loss.backward()
     optimizer.step()
+
+context = torch.zeros((1, 1), dtype=torch.long, device=device)
+print(decode(m.generate(context, max_new_tokens=500)[0].tolist()))
