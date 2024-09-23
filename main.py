@@ -2,7 +2,8 @@ import torch
 import torch.nn as nn
 from torch.nn import functional as F
 from bigram import BigramLanguageModel
-from helper_functions import get_batch, estimate_loss
+from data_processing import *
+from helper_functions import *
 import time
 
 ## USER INPUTS ##
@@ -12,7 +13,7 @@ train_test_split = 0.8
 block_size = 8
 batch_size = 4
 
-max_iters = 1000
+max_iters = 10000
 learning_rate = 3e-4
 eval_iters = 250
 dropout = 0.2
@@ -21,18 +22,10 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print(device)
 
 ## READ DATA ##
-with open(data_path, 'r', encoding='utf-8') as f:
-    text = f.read()
-chars = sorted(set(text))
-vocab_size = len(chars)
+corpus = load_file(data_path)
+encode, decode, vocab_size = tokenize(corpus)
 
-strToInt = {c:i for i,c, in enumerate(chars)}
-intToStr = {i:c for i,c in enumerate(chars)}
-
-encode = lambda s: [strToInt[c] for c in s]
-decode = lambda l: ''.join([intToStr[i] for i in l])
-
-data = torch.tensor(encode(text),dtype=torch.long)
+data = torch.tensor(encode(corpus), dtype=torch.long)
 
 n = int(train_test_split*len(data))
 train_data = data[:n]
