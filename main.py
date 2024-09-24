@@ -6,7 +6,7 @@ from data_processing import *
 from helper_functions import *
 import os
 
-## USER INPUTS ##
+##### USER INPUTS #####
 data_path = 'data'
 
 train_test_split = 0.8
@@ -16,7 +16,7 @@ batch_size = 32
 max_iters = 10000
 learning_rate = 1e-2
 eval_iters = 250
-#################
+#######################
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print(device)
@@ -25,9 +25,9 @@ corpus = ''
 for file in os.listdir(data_path):
     path = data_path + '/' + file
     corpus = corpus + load_file(path)
-encode, decode, vocab_size = tokenize(corpus)
 
-data = torch.tensor(encode(corpus), dtype=torch.long)
+encode, decode, vocab_size = tokenize_words(corpus)
+data = torch.tensor(encode(list(corpus.split(" "))), dtype=torch.long)
 
 n = int(train_test_split*len(data))
 train_data = data[:n]
