@@ -22,13 +22,26 @@ def tokenize_chars(text):
     decode = lambda l: ' '.join([intToStr[i] for i in l])
     return encode, decode, vocab_size
 
-def tokenize_words(text):
-    words = set(text.split(" "))
-    vocab_size = len(words)
+def tokenize_words(text, max_words):
+    wordsCount = dict()
+    words = text.split(" ")
+    vocab_size = len(set(words))
+
+    for word in words:
+        wordsCount[word] = wordsCount.get(word, 0) + 1
+
+    top_words = sorted(wordsCount.items(), key=lambda x: x[1], reverse=True)
+
+    if vocab_size > max_words:
+        words = set([w[0] for w in top_words[0:max_words]])
+        vocab_size = len(words)
+    else:
+        words = set(words)
 
     strToInt = {w: i for i, w, in enumerate(words)}
     intToStr = {i: w for i, w in enumerate(words)}
 
-    encode = lambda s: [strToInt[w] for w in s]
-    decode = lambda l: ''.join([intToStr[i] for i in l])
+    encode = lambda s: [strToInt[w] for w in s if w in strToInt]
+    decode = lambda l: ''.join([intToStr[i] + ' ' for i in l])
     return encode, decode, vocab_size
+

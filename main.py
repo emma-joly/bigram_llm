@@ -1,6 +1,3 @@
-import torch
-import torch.nn as nn
-from torch.nn import functional as F
 from bigram import BigramLanguageModel
 from data_processing import *
 from helper_functions import *
@@ -16,6 +13,8 @@ batch_size = 32
 max_iters = 10000
 learning_rate = 1e-2
 eval_iters = 250
+
+max_words = 5000
 #######################
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -26,7 +25,7 @@ for file in os.listdir(data_path):
     path = data_path + '/' + file
     corpus = corpus + load_file(path)
 
-encode, decode, vocab_size = tokenize_words(corpus)
+encode, decode, vocab_size = tokenize_words(corpus, max_words)
 data = torch.tensor(encode(list(corpus.split(" "))), dtype=torch.long)
 
 n = int(train_test_split*len(data))
